@@ -189,9 +189,9 @@ Contributions are welcome!
 
 ## Support
 
-- [Report Issues](https://github.com/YOUR-USERNAME/DayZ-Types-Editor/issues)
-- [View Documentation](https://github.com/YOUR-USERNAME/DayZ-Types-Editor/wiki)
-- [Latest Release](https://github.com/YOUR-USERNAME/DayZ-Types-Editor/releases/latest)
+- [Report Issues](https://github.com/Look4orion/DayZ-Types-Editor/issues)
+- [View Documentation](https://github.com/Look4orion/DayZ-Types-Editor/wiki)
+- [Latest Release](https://github.com/Look4orion/DayZ-Types-Editor/releases/latest)
 
 ## License
 
