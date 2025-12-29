@@ -1,3 +1,5 @@
+[![Release](https://img.shields.io/github/v/release/YOUR-USERNAME/DayZ-Types-Editor)](https://github.com/YOUR-USERNAME/DayZ-Types-Editor/releases)
+
 # DayZ Types Editor
 
 A desktop application for editing and managing DayZ server types.xml files with SFTP support, map-based spawn visualization, and batch operations.
@@ -149,3 +151,5 @@ Next up: Phase 5 - Save/Upload System with:
 ### Backups filling up disk
 - Use Settings → Backup Management → Clean Up Old Backups
 - This keeps only the last 10 backups per file
+
+[![Release](https://img.shields.io/github/v/release/YOUR-USERNAME/DayZ-Types-Editor)](https://github.com/YOUR-USERNAME/DayZ-Types-Editor/releases)
