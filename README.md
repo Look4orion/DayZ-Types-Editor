@@ -1,4 +1,4 @@
-[![Release](https://img.shields.io/github/v/release/YOUR-USERNAME/DayZ-Types-Editor)](https://github.com/YOUR-USERNAME/DayZ-Types-Editor/releases)
+[![Release](https://img.shields.io/github/v/release/Look4orion/DayZ-Types-Editor)](https://github.com/Look4orion/DayZ-Types-Editor/releases)
 
 # DayZ Types Editor
 
@@ -152,4 +152,4 @@ Next up: Phase 5 - Save/Upload System with:
 - Use Settings → Backup Management → Clean Up Old Backups
 - This keeps only the last 10 backups per file
 
-[![Release](https://img.shields.io/github/v/release/YOUR-USERNAME/DayZ-Types-Editor)](https://github.com/YOUR-USERNAME/DayZ-Types-Editor/releases)
+[![Release](https://img.shields.io/github/v/release/Look4orion/DayZ-Types-Editor)](https://github.com/Look4orion/DayZ-Types-Editor/releases)
