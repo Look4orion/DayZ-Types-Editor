@@ -69,4 +69,8 @@ cache/
 dist/
 build/
 *.exe
+<<<<<<< HEAD
 *.zip
+=======
+*.zip
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99

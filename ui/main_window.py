@@ -18,7 +18,10 @@ from models.type_item import TypeItem
 from ui.types_editor import TypesEditorTab
 from ui.settings_tab import SettingsTab
 from ui.sftp_dialog import SFTPDialog
+<<<<<<< HEAD
 from version import __version__
+=======
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
 from ui.startup_dialog import StartupDialog
 from ui.save_dialog import SaveDialog
 from typing import List, Dict
@@ -75,7 +78,11 @@ class MainWindow(QMainWindow):
     
     def init_ui(self):
         """Initialize the user interface"""
+<<<<<<< HEAD
         self.setWindowTitle(f"DayZ Types Editor v{__version__}")
+=======
+        self.setWindowTitle("DayZ Types Editor")
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
         self.setMinimumSize(1200, 800)
         
         # Create menu bar
@@ -243,6 +250,7 @@ th { background-color: #252526; }
 <ol>
 <li>Filter to desired items OR select multiple</li>
 <li>Click "Batch Operations" toolbar button</li>
+<<<<<<< HEAD
 <li>Configure changes in three columns:
   <ul>
   <li><b>Numeric Fields:</b> Check field, choose Multiply or Set Value, enter value</li>
@@ -256,6 +264,14 @@ th { background-color: #252526; }
 
 <p><b>Example:</b> To add Military usage to multiple items, check "Usage: Military" and toggle to ON.</p>
 
+=======
+<li>Check fields to modify</li>
+<li>Set values (Multiply or Set Value)</li>
+<li>Preview changes (green = changing)</li>
+<li>Click "Apply Changes"</li>
+</ol>
+
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
 <h3>Creating New Items</h3>
 <ol>
 <li>Click "New Item" toolbar button</li>
@@ -317,13 +333,19 @@ th { background-color: #252526; }
         QMessageBox.about(
             self,
             "About DayZ Types Editor",
+<<<<<<< HEAD
             f"<h2>DayZ Types Editor</h2>"
             f"<p>Version {__version__}</p>"
+=======
+            "<h2>DayZ Types Editor</h2>"
+            "<p>Version 1.0</p>"
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
             "<p>A comprehensive desktop application for editing DayZ types.xml files.</p>"
             "<p><b>Features:</b></p>"
             "<ul>"
             "<li>SFTP and Local file support</li>"
             "<li>Multi-file editing</li>"
+<<<<<<< HEAD
             "<li>Batch operations (Numeric, Category, Usage, Value, Tag, Flags)</li>"
             "<li>Smart filtering with AND/OR logic</li>"
             "<li>New item creation</li>"
@@ -333,6 +355,16 @@ th { background-color: #252526; }
             "</ul>"
             "<p>Created for DayZ server administrators and modders.</p>"
             "<p>© 2024 - Licensed under GPL v3.0</p>"
+=======
+            "<li>Batch operations</li>"
+            "<li>Smart filtering</li>"
+            "<li>Undo/Redo support</li>"
+            "<li>Automatic backups</li>"
+            "<li>File caching</li>"
+            "</ul>"
+            "<p>Created for DayZ server administrators and modders.</p>"
+            "<p>© 2024 - Use at your own risk. Always backup your files.</p>"
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
         )
     
     def show_sftp_dialog(self):

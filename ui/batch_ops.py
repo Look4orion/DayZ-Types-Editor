@@ -5,8 +5,12 @@ Allows batch modification of multiple items with preview
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
                              QPushButton, QDoubleSpinBox, QSpinBox, QTableWidget,
                              QTableWidgetItem, QCheckBox, QGroupBox, QComboBox,
+<<<<<<< HEAD
                              QScrollArea, QHeaderView, QFrame, QMessageBox, QGridLayout,
                              QWidget)
+=======
+                             QScrollArea, QHeaderView, QFrame, QMessageBox, QGridLayout)
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from models.type_item import TypeItem
@@ -24,8 +28,12 @@ class BatchOperationsDialog(QDialog):
         
         self.setWindowTitle("Batch Operations - Edit Multiple Items")
         self.setModal(True)
+<<<<<<< HEAD
         self.resize(1400, 800)  # Default size
         self.setMinimumSize(1200, 600)  # Minimum but allow resize
+=======
+        self.setMinimumSize(1100, 700)
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
         
         self.init_ui()
         self.calculate_preview()
@@ -64,6 +72,7 @@ class BatchOperationsDialog(QDialog):
         left_layout.addWidget(QLabel("<b>Mode</b>"), 0, 1)
         left_layout.addWidget(QLabel("<b>Value</b>"), 0, 2)
         
+<<<<<<< HEAD
         # Middle: Category and Multi-Select
         middle_group = QGroupBox("Category & Multi-Select")
         middle_outer_layout = QVBoxLayout()  # Outer layout for the group
@@ -74,6 +83,8 @@ class BatchOperationsDialog(QDialog):
         middle_layout.addWidget(QLabel("<b>Field</b>"), 0, 0)
         middle_layout.addWidget(QLabel("<b>Set To</b>"), 0, 1)
         
+=======
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
         # Right side: Flags
         right_group = QGroupBox("Flags")
         right_layout = QGridLayout()
@@ -155,6 +166,7 @@ class BatchOperationsDialog(QDialog):
                 'value': value_input
             }
         
+<<<<<<< HEAD
         # Build middle fields - Category and Multi-select in scrollable area
         middle_row = 1
         
@@ -253,6 +265,8 @@ class BatchOperationsDialog(QDialog):
         # Set the layout for middle group
         middle_group.setLayout(middle_layout)
         
+=======
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
         # Build flag fields
         for row, (field_name, display_name, default_mode, default_value) in enumerate(flag_fields, start=1):
             # Checkbox
@@ -274,11 +288,18 @@ class BatchOperationsDialog(QDialog):
                 'value': toggle  # Store toggle switch as value control
             }
         
+<<<<<<< HEAD
         # Assemble three-column layout
         left_group.setLayout(left_layout)
         right_group.setLayout(right_layout)
         fields_main_layout.addWidget(left_group)
         fields_main_layout.addWidget(middle_group)
+=======
+        # Assemble two-column layout
+        left_group.setLayout(left_layout)
+        right_group.setLayout(right_layout)
+        fields_main_layout.addWidget(left_group)
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
         fields_main_layout.addWidget(right_group)
         fields_group.setLayout(fields_main_layout)
         layout.addWidget(fields_group)
@@ -390,6 +411,7 @@ class BatchOperationsDialog(QDialog):
             # Check each field
             for field_name, controls in self.field_controls.items():
                 if controls['checkbox'].isChecked():
+<<<<<<< HEAD
                     
                     # Handle category
                     if field_name == 'category':
@@ -460,6 +482,39 @@ class BatchOperationsDialog(QDialog):
                             'old': old_value,
                             'new': new_value
                         }
+=======
+                    old_value = getattr(item, field_name)
+                    
+                    # Flags don't have mode dropdown (use toggle switch)
+                    if controls['mode'] is None:
+                        # Flag field - get value from toggle switch (1 if checked, 0 if not)
+                        new_value = 1 if controls['value'].isChecked() else 0
+                    else:
+                        mode = controls['mode'].currentText()
+                        input_value = controls['value'].value()
+                        
+                        if mode == 'Multiply':
+                            new_value = int(old_value * input_value)
+                        else:  # Set Value
+                            new_value = int(input_value)
+                        
+                        # Validation: min shouldn't exceed nominal
+                        if field_name == 'min' and 'nominal' in self.field_controls:
+                            nominal_value = getattr(item, 'nominal')
+                            # If nominal is also being changed, use new nominal
+                            if self.field_controls['nominal']['checkbox'].isChecked():
+                                nominal_controls = self.field_controls['nominal']
+                                if nominal_controls['mode'].currentText() == 'Multiply':
+                                    nominal_value = int(nominal_value * nominal_controls['value'].value())
+                                else:
+                                    nominal_value = int(nominal_controls['value'].value())
+                            new_value = min(new_value, nominal_value)
+                    
+                    item_data['changes'][field_name] = {
+                        'old': old_value,
+                        'new': new_value
+                    }
+>>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
             
             # Only add if there are changes
             if item_data['changes']:
