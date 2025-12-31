@@ -1,0 +1,5 @@
+PyQt5>=5.15.0
+paramiko>=2.7.0
+cryptography>=3.4.0
+Pillow>=8.0.0
+pyinstaller>=5.0.0
