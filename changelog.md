@@ -8,11 +8,100 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned Features
+- Loot map viewer with spawn location visualization
 - Import/export presets for batch operations
 - Search and replace functionality
 - Dark/light theme toggle
 - Export to CSV/Excel
 - Multi-language support
+
+---
+
+## [2.0.0] - 2025-01-17
+
+### Major Features Added
+
+#### Spawnable Types Editor
+- **Full cfgspawnabletypes.xml Support**: Complete editing of spawnable type configurations
+- **Cargo Blocks**: Add, edit, delete cargo blocks (preset-based or chance-based)
+- **Attachments Blocks**: Add, edit, delete attachments blocks (preset-based or chance-based)
+- **Preset Tooltips**: Hover over preset blocks/dropdowns to see contents
+- **Item Management**: Add, edit, delete, reorder items in chance-based blocks
+- **Two-Step Workflow**: Guided creation of chance-based blocks with required first item
+- **Properties Editing**: Set hoarder and damage flags per type
+- **Filtering**: Search by name, filter by file, properties (has hoarder, damage, cargo, attachments)
+- **Dark Mode UI**: Consistent styling with main Types Editor
+- **Undo/Redo**: Full support for all operations
+
+#### Random Presets Editor
+- **Full cfgrandompresets.xml Support**: Create and manage cargo and attachments presets
+- **Preset Management**: Add, edit, delete presets with name and chance
+- **Item Management**: Add, edit, remove items from presets with individual chances
+- **Dual Preset Types**: Separate cargo and attachments preset lists
+- **Validation**: Item name validation against types.xml, duplicate preset name prevention
+- **Filtering**: Filter by preset type (cargo/attachments) or search by name
+- **Dark Mode UI**: Matching design throughout
+- **Undo/Redo**: Track all preset and item changes
+
+#### File Discovery
+- **Vanilla File Support**: Automatically detect and load db/types.xml and cfgspawnabletypes.xml
+- **Smart Loading**: Check for vanilla files not always referenced in cfgeconomycore.xml
+- **Priority Ordering**: Load vanilla files first (matching game behavior)
+
+#### Unified Save System
+- **Multi-File Save**: Save changes across types, spawnable types, and presets in one operation
+- **Save Dialog**: Review and select which modified files to save
+- **Consistent Behavior**: All tabs share unified save workflow
+- **Validation**: Check for errors before writing files
+- **Backup Integration**: Automatic backups before every save
+
+### Enhanced
+- **Context Menus**: Right-click operations for blocks and items
+- **Keyboard Shortcuts**: Undo (Ctrl+Z), Redo (Ctrl+Y), Save (Ctrl+S) work across all tabs
+- **Modified Tracking**: Visual indicators for unsaved changes in all tabs
+- **Error Handling**: Better validation and user feedback throughout
+
+### Fixed
+- Dialog initialization errors in add/edit dialogs
+- Dark mode styling inconsistencies (white/black boxes eliminated)
+- Unhashable type errors in filter operations
+- Missing imports and attribute errors
+- Vanilla file discovery and loading
+
+### Technical
+- **New Models**: SpawnableType, SpawnableTypesFile, RandomPreset, RandomPresetsFile
+- **New Parsers**: spawnabletypes_parser.py, random_presets_parser.py
+- **New Writers**: spawnabletypes_writer.py, random_presets_writer.py
+- **New UI Tabs**: spawnable_types_tab.py, random_presets_tab.py
+- **New Dialogs**: add_block_dialog.py, edit_block_dialog.py, add_item_dialog.py, edit_item_dialog.py, add_preset_dialog.py
+
+---
+
+## [1.0.1] - 2024-12-30
+
+### Added
+- **Batch Operations Expanded**: Added Category, Usage, Value, and Tag editing
+  - Category field with dropdown (set or clear)
+  - All Usage flags with toggle switches (add/remove)
+  - All Value flags with toggle switches (add/remove)
+  - All Tag flags with toggle switches (add/remove)
+  - Three-column layout for better organization
+  - Scrollable multi-select area (3 columns, max 400px height)
+- **Enhanced Spinboxes**: Larger up/down arrows (30px wide) for easier clicking
+- **Toggle Switches**: iOS-style animated toggles for all flag editing
+  - Blue when ON, gray when OFF
+  - Smooth animations
+  - Clear visual feedback
+
+### Changed
+- Batch Operations dialog now resizable (default 1400x800, min 1200x600)
+- Multi-select fields organized in compact 3-column grid
+- Removed default checkboxes in batch operations (user must explicitly select fields)
+
+### Fixed
+- Middle column layout in batch operations now displays correctly
+- Toggle switches now properly respond to clicks
+- Import errors resolved (QWidget, QScrollArea)
 
 ---
 
@@ -198,5 +287,7 @@ Created for DayZ server administrators and modders who need efficient bulk editi
 
 ---
 
-[Unreleased]: https://github.com/YOUR-USERNAME/DayZ-Types-Editor/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/YOUR-USERNAME/DayZ-Types-Editor/releases/tag/v1.0.0
+[Unreleased]: https://github.com/Look4orion/DayZ-Types-Editor/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Look4orion/DayZ-Types-Editor/releases/tag/v2.0.0
+[1.0.1]: https://github.com/Look4orion/DayZ-Types-Editor/releases/tag/v1.0.1
+[1.0.0]: https://github.com/Look4orion/DayZ-Types-Editor/releases/tag/v1.0.0

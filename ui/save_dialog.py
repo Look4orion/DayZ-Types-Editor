@@ -5,16 +5,23 @@ from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
                              QPushButton, QCheckBox, QScrollArea, QWidget,
                              QFrame)
 from PyQt5.QtCore import Qt
-from typing import List
+from typing import List, Optional
 from models.types_file import TypesFile
+from models.spawnable_type import SpawnableTypesFile
 
 class SaveDialog(QDialog):
     """Dialog to select which modified files to save"""
     
-    def __init__(self, parent, types_files: List[TypesFile]):
+    def __init__(self, parent, types_files: List[TypesFile], 
+                 spawnabletypes_files: List[SpawnableTypesFile] = None,
+                 has_random_preset_changes: bool = False):
         super().__init__(parent)
         self.types_files = types_files
+        self.spawnabletypes_files = spawnabletypes_files or []
+        self.has_random_preset_changes = has_random_preset_changes
         self.file_checkboxes = {}
+        self.spawnabletypes_checkboxes = {}
+        self.random_presets_checkbox = None
         
         self.setWindowTitle("Save Changes")
         self.setModal(True)
@@ -27,8 +34,13 @@ class SaveDialog(QDialog):
         """Create the dialog UI"""
         layout = QVBoxLayout()
         
+        # Count total changes
+        total_files = len(self.types_files) + len(self.spawnabletypes_files)
+        if self.has_random_preset_changes:
+            total_files += 1
+        
         # Header
-        header = QLabel(f"Select files to save ({len(self.types_files)} file(s) modified):")
+        header = QLabel(f"Select files to save ({total_files} file(s) modified):")
         header.setStyleSheet("font-weight: bold; font-size: 12px; padding: 5px;")
         layout.addWidget(header)
         
@@ -41,7 +53,7 @@ class SaveDialog(QDialog):
         container_layout = QVBoxLayout()
         container_layout.setSpacing(5)
         
-        # Create checkbox for each file
+        # Create checkbox for each types file
         for types_file in self.types_files:
             modified_count = len(types_file.get_modified_items())
             
@@ -50,6 +62,24 @@ class SaveDialog(QDialog):
             cb.setProperty('types_file', types_file)
             
             self.file_checkboxes[types_file.path] = cb
+            container_layout.addWidget(cb)
+        
+        # Create checkbox for each spawnable types file
+        for spawnable_types_file in self.spawnabletypes_files:
+            type_count = len(spawnable_types_file.types)
+            
+            cb = QCheckBox(f"{spawnable_types_file.source_file} ({type_count} type(s))")
+            cb.setChecked(True)  # All checked by default
+            cb.setProperty('spawnable_types_file', spawnable_types_file)
+            
+            self.spawnabletypes_checkboxes[spawnable_types_file.source_file] = cb
+            container_layout.addWidget(cb)
+        
+        # Add random presets checkbox if modified
+        if self.has_random_preset_changes:
+            cb = QCheckBox("cfgrandompresets.xml (modified)")
+            cb.setChecked(True)
+            self.random_presets_checkbox = cb
             container_layout.addWidget(cb)
         
         container_layout.addStretch()
@@ -92,20 +122,43 @@ class SaveDialog(QDialog):
         """Check all file checkboxes"""
         for cb in self.file_checkboxes.values():
             cb.setChecked(True)
+        for cb in self.spawnabletypes_checkboxes.values():
+            cb.setChecked(True)
+        if self.random_presets_checkbox:
+            self.random_presets_checkbox.setChecked(True)
     
     def select_none(self):
         """Uncheck all file checkboxes"""
         for cb in self.file_checkboxes.values():
             cb.setChecked(False)
+        for cb in self.spawnabletypes_checkboxes.values():
+            cb.setChecked(False)
+        if self.random_presets_checkbox:
+            self.random_presets_checkbox.setChecked(False)
     
     def get_selected_files(self) -> List[TypesFile]:
-        """Get list of selected files to save"""
+        """Get list of selected types files to save"""
         selected = []
         for cb in self.file_checkboxes.values():
             if cb.isChecked():
                 types_file = cb.property('types_file')
                 selected.append(types_file)
         return selected
+    
+    def get_selected_spawnabletypes_files(self) -> List[SpawnableTypesFile]:
+        """Get list of selected spawnable types files to save"""
+        selected = []
+        for cb in self.spawnabletypes_checkboxes.values():
+            if cb.isChecked():
+                spawnable_types_file = cb.property('spawnable_types_file')
+                selected.append(spawnable_types_file)
+        return selected
+    
+    def should_save_random_presets(self) -> bool:
+        """Check if random presets should be saved"""
+        if self.random_presets_checkbox:
+            return self.random_presets_checkbox.isChecked()
+        return False
     
     def apply_dark_theme(self):
         """Apply dark theme styling"""

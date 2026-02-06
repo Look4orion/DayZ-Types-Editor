@@ -1,216 +1,248 @@
 # DayZ Types Editor
 
-[![Release](https://img.shields.io/github/v/release/Look4orion/DayZ-Types-Editor)](https://github.com/Look4orion/DayZ-Types-Editor/releases)
-[![Platform](https://img.shields.io/badge/platform-Windows-blue)](https://github.com/Look4orion/DayZ-Types-Editor/releases)
-[![Python](https://img.shields.io/badge/python-3.8+-blue)](https://www.python.org/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
-A comprehensive desktop application for editing DayZ `types.xml` files with support for both SFTP (remote server) and local file access.
-
-![DayZ Types Editor Screenshot](docs/screenshot.png)
+A comprehensive desktop application for editing and managing DayZ server economy files with SFTP support, including types.xml, cfgspawnabletypes.xml, and cfgrandompresets.xml.
 
 ## Features
 
-### Core Functionality
-- **Dual File Source Support** - Connect via SFTP or work with local files
-- **Multi-file Editing** - Load and edit multiple types.xml files simultaneously
-- **Smart Filtering** - Filter by name, category, usage, value, tags, flags, and nominal range
-- **Batch Operations** - Modify multiple items at once with live preview
-  - Edit numeric fields (Nominal, Lifetime, Min, Restock, Quantmin, Quantmax, Cost)
-  - Edit Category (set or clear)
-  - Edit Usage flags (add/remove multiple)
-  - Edit Value flags (add/remove multiple)
-  - Edit Tag flags (add/remove multiple)
-  - Edit item flags (6 binary flags)
-- **New Item Creation** - Add type entries with duplicate name detection
-- **Undo/Redo** - Track up to 50 changes
-- **Auto Backup** - Automatic timestamped backups before saving
-- **File Caching** - 80-90% faster load times on subsequent opens
-- **Built-in Help** - Quick reference guide in Help menu
+### Core Capabilities
+- ✅ **Types Editor** - Full control over item spawn economy (types.xml)
+- ✅ **Spawnable Types Editor** - Manage item attachments and cargo presets (cfgspawnabletypes.xml)
+- ✅ **Random Presets Editor** - Create and edit cargo/attachment preset definitions (cfgrandompresets.xml)
+- ✅ **SFTP & Local File Support** - Work with remote servers or local files
+- ✅ **Automatic File Discovery** - Loads all economy files including vanilla db/types.xml and cfgspawnabletypes.xml
+- ✅ **Unified Save System** - Save multiple modified files together with validation
+- ✅ **Dark Theme UI** - Comfortable editing experience
+- ✅ **Undo/Redo System** - Track changes across all tabs
 
-### User Interface
-- Dark theme throughout
-- Enhanced spinboxes with larger arrows
-- Toggle switches for flag editing
-- Real-time validation
-- Responsive design
+### Types Editor
+- ✅ Multi-file editing (all types.xml files from cfgeconomycore.xml)
+- ✅ Advanced filtering (name, category, tags, usage, value, flags, nominal range, file)
+- ✅ AND/OR filter logic
+- ✅ Batch operations (multiply/set values for multiple items)
+- ✅ Individual item editing with live validation
+- ✅ New item creation with duplicate detection
+- ✅ Item flags: Count in Cargo/Hoarder/Map/Player, Crafted, Deloot
 
-## Download
+### Spawnable Types Editor
+- ✅ Edit cargo and attachments blocks for any spawnable type
+- ✅ Preset-based blocks (reference cfgrandompresets.xml)
+- ✅ Chance-based blocks (inline item definitions with probabilities)
+- ✅ Preset tooltips showing contents on hover
+- ✅ Full CRUD operations (create, edit, delete blocks and items)
+- ✅ Item reordering (spawn priority control)
+- ✅ Two-step guided workflow for chance-based blocks
+- ✅ Hoarder and Damage properties per type
+- ✅ Filter by file, properties, or search
+- ✅ Undo/redo support for all operations
 
-**[Download Latest Release](https://github.com/Look4orion/DayZ-Types-Editor/releases/latest)**
+### Random Presets Editor
+- ✅ Create and manage cargo presets
+- ✅ Create and manage attachments presets
+- ✅ Set preset-level and item-level chance values
+- ✅ Add/edit/remove items from presets
+- ✅ Item name validation against types.xml
+- ✅ Filter presets by name or type
+- ✅ Undo/redo support
+- ✅ Validation prevents duplicate names
 
-### Windows
-1. Download `DayZTypesEditor-v1.0.1-Windows.zip`
-2. Extract to any folder
-3. Run `DayZTypesEditor.exe`
-4. No installation required
+### File Management
+- ✅ Automatic discovery of vanilla files (db/types.xml, cfgspawnabletypes.xml)
+- ✅ Parse all files referenced in cfgeconomycore.xml
+- ✅ Comment preservation in XML files
+- ✅ File caching system (80-90% faster subsequent loads)
+- ✅ Automatic timestamped backups before saves
+- ✅ Modified file tracking across all tabs
 
-## Quick Start
+## Installation
 
-### SFTP Connection
-1. Launch the application
-2. Select "Connect to SFTP Server"
-3. Enter server details:
-   - Host (IP or domain)
-   - Port (default: 22)
-   - Username & Password
-   - Mission folder path
-4. Click "Connect"
+### Requirements
+- Python 3.8 or higher
+- PyQt5
+- paramiko (SFTP)
+- cryptography (for credential encryption)
 
-### Local Files
-1. Launch the application
-2. Select "Use Local Files"
-3. Browse to your mission folder
-4. Click "Connect"
+### Install Dependencies
 
-### Editing Items
-1. Use filters to find items
-2. Select item to edit in detail panel
-3. Modify values
-4. Click "Apply Changes"
-5. Save when ready (Ctrl+S)
-
-### Batch Editing
-1. Filter to desired items or select multiple
-2. Click "Batch Operations"
-3. Configure changes in three columns:
-   - **Numeric**: Nominal, Lifetime, Min, Restock, Quantmin, Quantmax, Cost
-   - **Category & Multi-Select**: Category dropdown, Usage/Value/Tag toggles
-   - **Flags**: Six item flags with toggle switches
-4. Preview changes (green = will change)
-5. Click "Apply Changes"
-
-### Creating New Items
-1. Click "New Item" in toolbar
-2. Enter unique item name
-3. Select target file
-4. Configure all fields
-5. Click "Create Item"
-
-## Field Reference
-
-### Numeric Fields
-- **Nominal** - Maximum number in world (0-99,999,999)
-- **Lifetime** - Seconds before despawn (0-99,999,999)
-- **Min** - Minimum to trigger respawn (0-Nominal)
-- **Restock** - Seconds before respawn (0-99,999,999)
-- **Quantmin** - Min stack percentage (-1 or 1-100)
-- **Quantmax** - Max stack percentage (-1 or 1-100)
-- **Cost** - Spawn priority/rarity (0-100)
-
-### Item Flags
-- **Count in Cargo** - Count items in containers toward nominal
-- **Count in Hoarder** - Count items in stashes toward nominal
-- **Count in Map** - Count spawned items toward nominal
-- **Count in Player** - Count items on players toward nominal
-- **Crafted** - Item can ONLY be crafted (will NOT spawn naturally)
-- **Deloot** - Remove from all natural spawns
-
-### Multi-Select
-- **Usage** - Spawn locations (Military, Police, Farm, etc.)
-- **Value** - Tier/rarity (Tier1=common, Tier4=rare)
-- **Tag** - Spawn restrictions (floor, shelves, etc.)
-- **Category** - Item classification
-
-## Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+S` | Save changes |
-| `Ctrl+Z` | Undo |
-| `Ctrl+Y` | Redo |
-| `Ctrl+F` | Focus search |
-
-## Requirements
-
-- Windows 10 or later
-- No additional software needed (standalone executable)
-
-## Building from Source
-
-### Prerequisites
-- Python 3.8 or later
-- pip package manager
-
-### Installation
 ```bash
-# Clone repository
-git clone https://github.com/Look4orion/DayZ-Types-Editor.git
-cd DayZ-Types-Editor
-
-# Install dependencies
 pip install -r requirements.txt
+```
 
-# Run application
+## Usage
+
+### Running the Application
+
+```bash
 python main.py
 ```
 
-### Building Executable
-```bash
-# Install PyInstaller
-pip install pyinstaller
+### First Time Setup
 
-# Build
-build.bat
+1. **Connect to Server**
+   - Go to File → Connect to Server (or Open Local Folder)
+   - **For SFTP:**
+     - Host: Your server IP
+     - Port: SSH port (default 22)
+     - Username: Your SSH username
+     - Password: Your SSH password
+     - Mission Path: Path to your mission folder (e.g., `/dayzserver/mpmissions/dayzOffline.deerisle/`)
+   - **For Local Files:**
+     - Browse to your local mission folder
+   - Optionally check "Save credentials" to auto-connect next time
 
-# Executable in dist/DayZTypesEditor/
+2. **Configure Backup Location** (Settings Tab)
+   - Default: `~/.dayz_types_editor/backups`
+   - Click "Browse..." to change location
+   - Backups are created automatically before saves
+
+### Working with Files
+
+The editor automatically loads:
+- All `types.xml` files referenced in `cfgeconomycore.xml`
+- Vanilla `db/types.xml` (if it exists)
+- All `cfgspawnabletypes.xml` files referenced in `cfgeconomycore.xml`
+- Vanilla `cfgspawnabletypes.xml` (if it exists)
+- `cfgrandompresets.xml` (if it exists)
+
+### Editing Types (Types Editor Tab)
+
+1. **Find Items:**
+   - Use search bar for names
+   - Apply filters (category, usage, value, tag, flags, nominal range)
+   - Toggle AND/OR logic for complex filters
+
+2. **Edit Single Item:**
+   - Select item in table
+   - Edit fields in detail panel
+   - Changes tracked automatically
+
+3. **Batch Edit:**
+   - Filter or multi-select items
+   - Click "Batch Operations"
+   - Choose operation (Multiply/Set Value)
+   - Preview changes before applying
+
+4. **Create New Item:**
+   - Click "New Item"
+   - Fill in all fields
+   - Duplicate names are detected
+
+### Editing Spawnable Types (Spawnable Types Tab)
+
+1. **Find Types:**
+   - Search by name
+   - Filter by file or properties (hoarder, damage, cargo, attachments)
+
+2. **Edit Cargo/Attachments:**
+   - Select type in list
+   - Add/Edit/Delete blocks (preset-based or chance-based)
+   - Add/Edit/Delete items in chance-based blocks
+   - Reorder items (controls spawn priority)
+   - Hover over presets to see contents
+
+3. **Block Types:**
+   - **Preset blocks:** Reference a preset from cfgrandompresets.xml
+   - **Chance blocks:** Define items inline with individual chances
+
+### Editing Presets (Random Presets Tab)
+
+1. **Create Preset:**
+   - Choose Cargo or Attachments
+   - Click "Add Preset"
+   - Set name and preset chance
+   - Add items with individual chances
+
+2. **Edit Preset:**
+   - Select preset in list
+   - Edit name or chance
+   - Add/Edit/Remove items
+
+### Saving Changes
+
+- File → Save Changes (Ctrl+S)
+- Review modified files
+- Select files to save
+- Backup created automatically
+- Changes uploaded (SFTP) or saved (Local)
+
+## Configuration Files
+
+The application stores configuration in:
+- `~/.dayz_types_editor/config.json` - Settings
+- `~/.dayz_types_editor/.key` - Encryption key for credentials
+
+## Project Structure
+
+```
+DayZTypesEditor/
+├── main.py                          # Entry point
+├── config/
+│   ├── app_config.py               # Configuration management
+│   ├── sftp_manager.py             # SFTP operations
+│   └── local_file_manager.py       # Local file operations
+├── core/
+│   ├── backup_manager.py           # Backup handling
+│   ├── economy_parser.py           # cfgEconomyCore.xml parser
+│   ├── limits_parser.py            # Limits definition parser
+│   ├── xml_parser.py               # types.xml parser
+│   ├── spawnabletypes_parser.py    # cfgspawnabletypes.xml parser
+│   ├── spawnabletypes_writer.py    # cfgspawnabletypes.xml writer
+│   ├── random_presets_parser.py    # cfgrandompresets.xml parser
+│   └── random_presets_writer.py    # cfgrandompresets.xml writer
+├── models/
+│   ├── type_item.py                # Type item data model
+│   ├── types_file.py               # Types file container
+│   ├── spawnable_type.py           # Spawnable type data model
+│   ├── spawnabletypes_file.py      # Spawnable types file container
+│   └── random_preset.py            # Random preset data model
+└── ui/
+    ├── main_window.py              # Main application window
+    ├── types_editor_tab.py         # Types editing tab
+    ├── spawnable_types_tab.py      # Spawnable types tab
+    ├── random_presets_tab.py       # Random presets tab
+    ├── settings_tab.py             # Settings tab
+    ├── sftp_dialog.py              # SFTP connection dialog
+    └── dialogs/
+        ├── add_block_dialog.py     # Add cargo/attachments block
+        ├── edit_block_dialog.py    # Edit existing block
+        ├── add_item_dialog.py      # Add item to block/preset
+        ├── edit_item_dialog.py     # Edit existing item
+        └── add_preset_dialog.py    # Add new preset
 ```
 
-## Configuration
+## Current Version
 
-Settings are stored in:
-```
-C:\Users\[Username]\.dayz_types_editor\
-├── config.json          # Application settings
-├── cache/               # File cache
-└── backups/             # Automatic backups
-```
+**v2.0.0** - Major Feature Release ✅
+
+Complete economy file editing suite with:
+- Types Editor (types.xml)
+- Spawnable Types Editor (cfgspawnabletypes.xml)
+- Random Presets Editor (cfgrandompresets.xml)
+- Unified save system
+- Automatic vanilla file discovery
+
+## Notes
+
+- The app requires network access for SFTP connections
+- All economy files are loaded into memory on connect
+- Changes are tracked but not saved until explicitly committed
+- Backups are created automatically before any save
+- Window position and size are remembered between sessions
+- Undo/redo works across all tabs (up to 50 changes)
+- Vanilla files (db/types.xml, cfgspawnabletypes.xml) are auto-detected
 
 ## Troubleshooting
 
-### Items Not Spawning?
-Check:
-- Nominal > 0
-- Min > 0
-- Crafted = 0 (unless craft-only)
-- Deloot = 0 (unless event-only)
-- At least one Usage flag set
-- At least one Value flag set
-
-### Connection Issues (SFTP)
-- Verify credentials
+### Cannot connect to SFTP server
+- Verify your server IP and port
 - Check firewall settings
-- Test connection in Settings tab
-- Ensure mission path is correct
+- Ensure SSH/SFTP is enabled on your server
+- Verify mission path exists on server
 
-### File Loading Errors
-- Check XML syntax
-- View error dialog for details
-- Verify file names match cfgeconomycore.xml
+### Map not displaying correctly
+- Check that image file exists and is valid PNG/JPG
+- Verify world bounds match your map's coordinate system
+- Try different coordinate origin settings
 
-## Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## Support
-
-- [Report Issues](https://github.com/Look4orion/DayZ-Types-Editor/issues)
-- [View Documentation](https://github.com/Look4orion/DayZ-Types-Editor/wiki)
-- [Latest Release](https://github.com/Look4orion/DayZ-Types-Editor/releases/latest)
-
-## License
-
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-Created for DayZ server administrators and modders who need efficient bulk editing of types.xml files.
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
+### Backups filling up disk
+- Use Settings → Backup Management → Clean Up Old Backups
+- This keeps only the last 10 backups per file

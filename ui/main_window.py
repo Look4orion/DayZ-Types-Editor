@@ -13,15 +13,17 @@ from core.backup_manager import BackupManager
 from core.limits_parser import LimitsParser
 from core.economy_parser import EconomyParser
 from core.xml_parser import TypesParser
+from core.random_presets_parser import RandomPresetsParser
+from core.spawnabletypes_parser import SpawnableTypesParser
 from models.types_file import TypesFile
 from models.type_item import TypeItem
+from models.spawnable_type import SpawnableTypesFile
 from ui.types_editor import TypesEditorTab
 from ui.settings_tab import SettingsTab
+from ui.random_presets_tab import RandomPresetsTab
+from ui.spawnable_types_tab import SpawnableTypesTab
 from ui.sftp_dialog import SFTPDialog
-<<<<<<< HEAD
 from version import __version__
-=======
->>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
 from ui.startup_dialog import StartupDialog
 from ui.save_dialog import SaveDialog
 from typing import List, Dict
@@ -40,6 +42,10 @@ class MainWindow(QMainWindow):
         
         # Data
         self.types_files: List[TypesFile] = []
+        self.spawnabletypes_files: List[SpawnableTypesFile] = []
+        self.random_presets_file = None  # RandomPresetsFile or None
+        self.has_random_preset_changes = False  # Track if random presets modified
+        self.has_spawnabletypes_changes = False  # Track if spawnable types modified
         self.undo_stack = []
         self.redo_stack = []
         self.max_undo_stack = 50
@@ -78,11 +84,7 @@ class MainWindow(QMainWindow):
     
     def init_ui(self):
         """Initialize the user interface"""
-<<<<<<< HEAD
         self.setWindowTitle(f"DayZ Types Editor v{__version__}")
-=======
-        self.setWindowTitle("DayZ Types Editor")
->>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
         self.setMinimumSize(1200, 800)
         
         # Create menu bar
@@ -94,9 +96,13 @@ class MainWindow(QMainWindow):
         
         # Create tabs
         self.types_editor_tab = TypesEditorTab(self)
+        self.random_presets_tab = RandomPresetsTab(self)
+        self.spawnable_types_tab = SpawnableTypesTab(self)
         self.settings_tab = SettingsTab(self)
         
         self.tabs.addTab(self.types_editor_tab, "Types Editor")
+        self.tabs.addTab(self.random_presets_tab, "Random Presets")
+        self.tabs.addTab(self.spawnable_types_tab, "Spawnable Types")
         self.tabs.addTab(self.settings_tab, "Settings")
         
         # Initialize undo/redo button states
@@ -250,7 +256,6 @@ th { background-color: #252526; }
 <ol>
 <li>Filter to desired items OR select multiple</li>
 <li>Click "Batch Operations" toolbar button</li>
-<<<<<<< HEAD
 <li>Configure changes in three columns:
   <ul>
   <li><b>Numeric Fields:</b> Check field, choose Multiply or Set Value, enter value</li>
@@ -264,14 +269,6 @@ th { background-color: #252526; }
 
 <p><b>Example:</b> To add Military usage to multiple items, check "Usage: Military" and toggle to ON.</p>
 
-=======
-<li>Check fields to modify</li>
-<li>Set values (Multiply or Set Value)</li>
-<li>Preview changes (green = changing)</li>
-<li>Click "Apply Changes"</li>
-</ol>
-
->>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
 <h3>Creating New Items</h3>
 <ol>
 <li>Click "New Item" toolbar button</li>
@@ -290,6 +287,89 @@ th { background-color: #252526; }
 <li>Files uploaded (SFTP) or saved (Local)</li>
 </ol>
 
+<h2>Spawnable Types Editor</h2>
+
+<h3>Overview</h3>
+<p>Edit <code>cfgspawnabletypes.xml</code> files to control what items spawn attached to or inside other items.</p>
+
+<h3>Block Types</h3>
+<table>
+<tr><th>Type</th><th>Description</th></tr>
+<tr><td><b>Preset Block</b></td><td>References a preset from cfgrandompresets.xml</td></tr>
+<tr><td><b>Chance Block</b></td><td>Defines items inline with individual spawn chances</td></tr>
+</table>
+
+<h3>Cargo vs Attachments</h3>
+<table>
+<tr><th>Type</th><th>Purpose</th><th>Example</th></tr>
+<tr><td><b>Cargo</b></td><td>Items inside container</td><td>Food in backpack</td></tr>
+<tr><td><b>Attachments</b></td><td>Items attached to item</td><td>Magazine in gun</td></tr>
+</table>
+
+<h3>Working with Blocks</h3>
+<ol>
+<li>Select type in list (filter by file or properties)</li>
+<li>Right-click cargo/attachments tree for context menu</li>
+<li>Add Block → Choose preset or chance-based</li>
+<li>Edit Block → Change preset or adjust chance</li>
+<li>Delete Block → Remove entirely</li>
+<li>Hover over preset blocks to see contents</li>
+</ol>
+
+<h3>Chance-Based Blocks</h3>
+<ul>
+<li><b>Block Chance:</b> Probability this block attempts to spawn (0.0-1.0)</li>
+<li><b>Item Chance:</b> Probability each item spawns if block triggers</li>
+<li><b>First Item Wins:</b> Only first successful item spawns per block</li>
+<li><b>Reordering:</b> Use Move Up/Down to control spawn priority</li>
+</ul>
+
+<h3>Properties</h3>
+<table>
+<tr><th>Property</th><th>Effect</th></tr>
+<tr><td><b>Hoarder</b></td><td>Can spawn in underground stashes</td></tr>
+<tr><td><b>Damage</b></td><td>Spawns with random damage (0.0-1.0 range)</td></tr>
+</table>
+
+<h2>Random Presets Editor</h2>
+
+<h3>Overview</h3>
+<p>Create and manage presets in <code>cfgrandompresets.xml</code> for reuse across multiple spawnable types.</p>
+
+<h3>Preset Structure</h3>
+<ul>
+<li><b>Preset Name:</b> Unique identifier (e.g., "foodMilitary")</li>
+<li><b>Preset Chance:</b> Probability preset attempts to spawn (0.0-1.0)</li>
+<li><b>Items:</b> List of items with individual spawn chances</li>
+</ul>
+
+<h3>Creating Presets</h3>
+<ol>
+<li>Choose Cargo or Attachments preset type</li>
+<li>Click "Add Preset"</li>
+<li>Enter name and preset chance</li>
+<li>Add items with individual chances</li>
+<li>Item names validated against types.xml</li>
+</ol>
+
+<h3>Using Presets</h3>
+<ol>
+<li>Create preset in Random Presets tab</li>
+<li>Go to Spawnable Types tab</li>
+<li>Select type → Add Block → Preset-based</li>
+<li>Choose your preset from dropdown</li>
+<li>Hover to see preset contents</li>
+</ol>
+
+<h3>Best Practices</h3>
+<ul>
+<li>Name presets descriptively (e.g., "policeWeapons", "medicalSupplies")</li>
+<li>Group similar items together</li>
+<li>Reuse presets across multiple types for consistency</li>
+<li>Higher chance = more likely to spawn</li>
+<li>Total item chances can exceed 1.0 (each rolls independently)</li>
+</ul>
+
 <h2>Keyboard Shortcuts</h2>
 <ul>
 <li><b>Ctrl+S</b> - Save changes</li>
@@ -300,11 +380,15 @@ th { background-color: #252526; }
 
 <h2>Important Notes</h2>
 <ul>
+<li><b>Unified Save:</b> Save dialog shows ALL modified files (types, spawnable types, presets) - select which to save</li>
+<li><b>Vanilla Files:</b> Editor automatically loads db/types.xml and cfgspawnabletypes.xml if they exist</li>
 <li><b>Crafted Flag:</b> Setting this to 1 means the item can ONLY be obtained through crafting - it will NOT spawn naturally in the world</li>
 <li><b>Min vs Nominal:</b> Min cannot exceed Nominal (automatically capped)</li>
 <li><b>Duplicate Names:</b> Each item name must be unique across all loaded files</li>
+<li><b>Undo Across Tabs:</b> Undo/Redo works across all tabs (Types, Spawnable Types, Random Presets)</li>
 <li><b>Undo After Save:</b> Cannot undo past save point (save is a commit)</li>
 <li><b>Backups:</b> Always created before saving - check Settings tab for location</li>
+<li><b>Preset Tooltips:</b> Hover over preset blocks or dropdown items to see contents</li>
 </ul>
 
 <h2>Troubleshooting</h2>
@@ -333,38 +417,25 @@ th { background-color: #252526; }
         QMessageBox.about(
             self,
             "About DayZ Types Editor",
-<<<<<<< HEAD
             f"<h2>DayZ Types Editor</h2>"
             f"<p>Version {__version__}</p>"
-=======
-            "<h2>DayZ Types Editor</h2>"
-            "<p>Version 1.0</p>"
->>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
-            "<p>A comprehensive desktop application for editing DayZ types.xml files.</p>"
+            "<p>A comprehensive economy file editor for DayZ servers.</p>"
             "<p><b>Features:</b></p>"
             "<ul>"
+            "<li>Types Editor - Full types.xml editing</li>"
+            "<li>Spawnable Types Editor - cfgspawnabletypes.xml support</li>"
+            "<li>Random Presets Editor - cfgrandompresets.xml management</li>"
             "<li>SFTP and Local file support</li>"
-            "<li>Multi-file editing</li>"
-<<<<<<< HEAD
-            "<li>Batch operations (Numeric, Category, Usage, Value, Tag, Flags)</li>"
+            "<li>Batch operations with live preview</li>"
             "<li>Smart filtering with AND/OR logic</li>"
-            "<li>New item creation</li>"
-            "<li>Undo/Redo support (50 changes)</li>"
-            "<li>Automatic backups</li>"
-            "<li>File caching (80-90% faster loads)</li>"
+            "<li>Preset tooltips and validation</li>"
+            "<li>Unified save system</li>"
+            "<li>Undo/Redo across all tabs (50 changes)</li>"
+            "<li>Automatic backups and file caching</li>"
+            "<li>Auto-discovery of vanilla files</li>"
             "</ul>"
             "<p>Created for DayZ server administrators and modders.</p>"
-            "<p>© 2024 - Licensed under GPL v3.0</p>"
-=======
-            "<li>Batch operations</li>"
-            "<li>Smart filtering</li>"
-            "<li>Undo/Redo support</li>"
-            "<li>Automatic backups</li>"
-            "<li>File caching</li>"
-            "</ul>"
-            "<p>Created for DayZ server administrators and modders.</p>"
-            "<p>© 2024 - Use at your own risk. Always backup your files.</p>"
->>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
+            "<p>© 2024-2025 - Licensed under GPL v3.0</p>"
         )
     
     def show_sftp_dialog(self):
@@ -404,12 +475,32 @@ th { background-color: #252526; }
             # Load limits definitions
             self.load_limits_definitions()
             
-            # Load economy core to find types files
+            # Load economy core to find types and spawnabletypes files
             economy_xml = self.file_manager.read_file('cfgeconomycore.xml')
-            types_file_paths = EconomyParser.parse(economy_xml)
+            types_file_paths, spawnabletypes_file_paths = EconomyParser.parse_all(economy_xml)
             
-            # Load files with progress dialog
+            # Add vanilla db/types.xml if it exists (not always in cfgeconomycore but loaded by game)
+            vanilla_types = 'db/types.xml'
+            if self.file_manager.file_exists(vanilla_types):
+                # Add at the beginning so it's loaded first (like vanilla does)
+                if vanilla_types not in types_file_paths:
+                    types_file_paths.insert(0, vanilla_types)
+            
+            # Add vanilla cfgspawnabletypes.xml if it exists (not in cfgeconomycore but loaded by game)
+            vanilla_spawnabletypes = 'cfgspawnabletypes.xml'
+            if self.file_manager.file_exists(vanilla_spawnabletypes):
+                # Add at the beginning so it's loaded first (like vanilla does)
+                if vanilla_spawnabletypes not in spawnabletypes_file_paths:
+                    spawnabletypes_file_paths.insert(0, vanilla_spawnabletypes)
+            
+            # Load types files with progress dialog
             self.load_types_files_with_progress(types_file_paths)
+            
+            # Load spawnable types files with progress dialog
+            self.load_spawnabletypes_files_with_progress(spawnabletypes_file_paths)
+            
+            # Load random presets (optional file)
+            self.load_random_presets()
             
         except Exception as e:
             QMessageBox.critical(
@@ -529,6 +620,88 @@ th { background-color: #252526; }
                 )
                 self.load_types_files_with_progress(types_file_paths, failed_files)
     
+    def load_spawnabletypes_files_with_progress(self, spawnabletypes_file_paths: List[str], retry_files: List[str] = None):
+        """Load spawnable types files with progress dialog"""
+        from ui.loading_progress_dialog import LoadingProgressDialog
+        from PyQt5.QtWidgets import QApplication
+        
+        if not spawnabletypes_file_paths:
+            print("No spawnable types files found in cfgeconomycore.xml")
+            return
+        
+        # Determine which files to load
+        files_to_load = retry_files if retry_files else spawnabletypes_file_paths
+        
+        # Create progress dialog
+        progress = LoadingProgressDialog(self, len(files_to_load))
+        progress.setWindowTitle("Loading Spawnable Types")
+        progress.show()
+        QApplication.processEvents()
+        
+        # Track errors
+        loading_errors = []
+        
+        # Load files (keep existing if retrying)
+        if not retry_files:
+            self.spawnabletypes_files = []
+        
+        for i, file_path in enumerate(files_to_load, 1):
+            if progress.is_cancelled():
+                break
+            
+            try:
+                # Read file
+                xml_content = self.file_manager.read_file(file_path)
+                
+                # Parse the XML
+                spawnable_types_file = SpawnableTypesParser.parse(xml_content, file_path)
+                
+                # If retrying, remove old version first
+                if retry_files:
+                    self.spawnabletypes_files = [stf for stf in self.spawnabletypes_files if stf.source_file != file_path]
+                
+                self.spawnabletypes_files.append(spawnable_types_file)
+                progress.update_progress(i, file_path, True)
+                
+            except Exception as e:
+                error_msg = str(e)
+                loading_errors.append({
+                    'file': file_path,
+                    'error': error_msg
+                })
+                progress.update_progress(i, file_path, False)
+            
+            QApplication.processEvents()
+        
+        progress.close()
+        
+        # Load data into tab
+        self.spawnable_types_tab.load_data(self.spawnabletypes_files)
+        
+        # Update status
+        total_types = sum(len(stf.types) for stf in self.spawnabletypes_files)
+        print(f"Loaded {len(self.spawnabletypes_files)} spawnable types files with {total_types} types")
+        
+        # Show error dialog if there were any errors
+        if loading_errors:
+            from ui.file_error_dialog import FileErrorDialog
+            error_dialog = FileErrorDialog(
+                self,
+                loading_errors,
+                len(spawnabletypes_file_paths),
+                len(self.spawnabletypes_files)
+            )
+            
+            if error_dialog.exec_() and hasattr(error_dialog, 'retry_requested') and error_dialog.retry_requested:
+                # User wants to retry - get list of failed files
+                failed_files = [err['file'] for err in loading_errors]
+                QMessageBox.information(
+                    self,
+                    "Retry Files",
+                    f"Please fix the {len(failed_files)} file(s) on your server, then click OK to retry loading them."
+                )
+                self.load_spawnabletypes_files_with_progress(spawnabletypes_file_paths, failed_files)
+    
     def load_limits_definitions(self):
         """Load limits definition files"""
         self.limits_parser = LimitsParser()
@@ -556,9 +729,55 @@ th { background-color: #252526; }
             import traceback
             traceback.print_exc()
     
+    def load_random_presets(self):
+        """Load random presets file (optional)"""
+        try:
+            presets_xml = self.file_manager.read_file('cfgrandompresets.xml')
+            self.random_presets_file = RandomPresetsParser.parse(presets_xml, 'cfgrandompresets.xml')
+            
+            # Load into tab
+            self.random_presets_tab.load_data(self.random_presets_file)
+            
+            total_presets = self.random_presets_file.get_total_preset_count()
+            print(f"Loaded cfgrandompresets.xml: {total_presets} presets "
+                  f"({len(self.random_presets_file.cargo_presets)} cargo, "
+                  f"{len(self.random_presets_file.attachments_presets)} attachments)")
+            
+        except FileNotFoundError:
+            # File doesn't exist - this is okay, user can create it later
+            self.random_presets_file = None
+            self.random_presets_tab.load_data(None)
+            print("cfgrandompresets.xml not found - file is optional and can be created later")
+            
+            # Show info message to user
+            QMessageBox.information(
+                self,
+                "Random Presets Not Found",
+                "The file 'cfgrandompresets.xml' was not found in your mission folder.\n\n"
+                "This file is optional. You can create it later by adding your first preset "
+                "in the Random Presets tab."
+            )
+            
+        except Exception as e:
+            # Parse error or other issue
+            self.random_presets_file = None
+            self.random_presets_tab.load_data(None)
+            print(f"Error loading cfgrandompresets.xml: {e}")
+            
+            # Show warning with option to continue
+            reply = QMessageBox.warning(
+                self,
+                "Random Presets Load Error",
+                f"Failed to load cfgrandompresets.xml:\n\n{str(e)}\n\n"
+                "The editor will continue without random presets support.\n"
+                "You can fix the file and reconnect to try again.",
+                QMessageBox.Ok
+            )
+    
     def has_unsaved_changes(self) -> bool:
         """Check if there are any unsaved changes"""
-        return any(tf.has_modifications() for tf in self.types_files)
+        types_modified = any(tf.has_modifications() for tf in self.types_files)
+        return types_modified or self.has_random_preset_changes or self.has_spawnabletypes_changes
     
     def update_status_bar(self):
         """Update status bar with current info"""
@@ -572,6 +791,14 @@ th { background-color: #252526; }
             if modified_count > 0:
                 status += f" | Modified: {modified_count} items ⚠"
             
+            # Add random preset changes indicator
+            if self.has_random_preset_changes:
+                status += f" | Random Presets Modified ⚠"
+            
+            # Add spawnable types changes indicator
+            if self.has_spawnabletypes_changes:
+                status += f" | Spawnable Types Modified ⚠"
+            
             self.status_bar.showMessage(status)
         else:
             self.status_bar.showMessage("Not connected")
@@ -584,28 +811,48 @@ th { background-color: #252526; }
         # Pop last change from undo stack
         change = self.undo_stack.pop()
         
-        # Store current state for redo
-        redo_snapshots = []
-        for item_name, old_snapshot in change:
-            # Find the current item
-            current_item = None
-            for types_file in self.types_files:
-                current_item = types_file.get_item_by_name(item_name)
-                if current_item:
-                    break
+        # Check if this is a random_presets change or types change
+        if isinstance(change, tuple) and change[0] == 'random_presets':
+            # Random presets undo
+            _, old_state = change
             
-            if current_item:
-                # Save current state for redo
-                redo_snapshots.append((item_name, current_item.clone()))
+            # Save current state for redo
+            if self.random_presets_file:
+                import copy
+                self.redo_stack.append(('random_presets', copy.deepcopy(self.random_presets_file)))
+            else:
+                self.redo_stack.append(('random_presets', None))
+            
+            # Restore old state
+            self.random_presets_file = old_state
+            self.random_presets_tab.load_data(old_state)
+            
+        else:
+            # Types items undo (existing behavior)
+            # Store current state for redo
+            redo_snapshots = []
+            for item_name, old_snapshot in change:
+                # Find the current item
+                current_item = None
+                for types_file in self.types_files:
+                    current_item = types_file.get_item_by_name(item_name)
+                    if current_item:
+                        break
                 
-                # Restore old state
-                self._apply_snapshot(current_item, old_snapshot)
-        
-        # Push to redo stack
-        self.redo_stack.append(redo_snapshots)
+                if current_item:
+                    # Save current state for redo
+                    redo_snapshots.append((item_name, current_item.clone()))
+                    
+                    # Restore old state
+                    self._apply_snapshot(current_item, old_snapshot)
+            
+            # Push to redo stack
+            self.redo_stack.append(redo_snapshots)
+            
+            # Update types editor UI
+            self.types_editor_tab.refresh_display()
         
         # Update UI
-        self.types_editor_tab.refresh_display()
         self.update_undo_redo_buttons()
         self.update_status_bar()
     
@@ -617,28 +864,48 @@ th { background-color: #252526; }
         # Pop last undone change from redo stack
         change = self.redo_stack.pop()
         
-        # Store current state for undo
-        undo_snapshots = []
-        for item_name, new_snapshot in change:
-            # Find the current item
-            current_item = None
-            for types_file in self.types_files:
-                current_item = types_file.get_item_by_name(item_name)
-                if current_item:
-                    break
+        # Check if this is a random_presets change or types change
+        if isinstance(change, tuple) and change[0] == 'random_presets':
+            # Random presets redo
+            _, new_state = change
             
-            if current_item:
-                # Save current state for undo
-                undo_snapshots.append((item_name, current_item.clone()))
+            # Save current state for undo
+            if self.random_presets_file:
+                import copy
+                self.undo_stack.append(('random_presets', copy.deepcopy(self.random_presets_file)))
+            else:
+                self.undo_stack.append(('random_presets', None))
+            
+            # Restore new state
+            self.random_presets_file = new_state
+            self.random_presets_tab.load_data(new_state)
+            
+        else:
+            # Types items redo (existing behavior)
+            # Store current state for undo
+            undo_snapshots = []
+            for item_name, new_snapshot in change:
+                # Find the current item
+                current_item = None
+                for types_file in self.types_files:
+                    current_item = types_file.get_item_by_name(item_name)
+                    if current_item:
+                        break
                 
-                # Restore new state
-                self._apply_snapshot(current_item, new_snapshot)
-        
-        # Push to undo stack
-        self.undo_stack.append(undo_snapshots)
+                if current_item:
+                    # Save current state for undo
+                    undo_snapshots.append((item_name, current_item.clone()))
+                    
+                    # Restore new state
+                    self._apply_snapshot(current_item, new_snapshot)
+            
+            # Push to undo stack
+            self.undo_stack.append(undo_snapshots)
+            
+            # Update types editor UI
+            self.types_editor_tab.refresh_display()
         
         # Update UI
-        self.types_editor_tab.refresh_display()
         self.update_undo_redo_buttons()
         self.update_status_bar()
     
@@ -709,8 +976,9 @@ th { background-color: #252526; }
         
         # Get modified files
         modified_files = [tf for tf in self.types_files if tf.has_modifications()]
+        modified_spawnabletypes = self.spawnabletypes_files if self.has_spawnabletypes_changes else []
         
-        if not modified_files:
+        if not modified_files and not modified_spawnabletypes and not self.has_random_preset_changes:
             QMessageBox.information(
                 self,
                 "No Changes",
@@ -718,14 +986,16 @@ th { background-color: #252526; }
             )
             return
         
-        # Show file selection dialog
-        dialog = SaveDialog(self, modified_files)
+        # Show file selection dialog with all modified files
+        dialog = SaveDialog(self, modified_files, modified_spawnabletypes, self.has_random_preset_changes)
         if not dialog.exec_():
             return
         
         selected_files = dialog.get_selected_files()
+        selected_spawnabletypes = dialog.get_selected_spawnabletypes_files()
+        save_random_presets = dialog.should_save_random_presets()
         
-        if not selected_files:
+        if not selected_files and not selected_spawnabletypes and not save_random_presets:
             QMessageBox.information(
                 self,
                 "No Files Selected",
@@ -733,8 +1003,17 @@ th { background-color: #252526; }
             )
             return
         
-        # Save files with progress
-        self.save_files_with_progress(selected_files)
+        # Save types files with progress
+        if selected_files:
+            self.save_files_with_progress(selected_files)
+        
+        # Save spawnable types files
+        if selected_spawnabletypes:
+            self.save_spawnabletypes_files(selected_spawnabletypes)
+        
+        # Save random presets if selected
+        if save_random_presets and self.random_presets_file:
+            self.save_random_presets_from_main()
     
     def save_files_with_progress(self, files_to_save: List[TypesFile]):
         """Save files with progress dialog"""
@@ -797,6 +1076,86 @@ th { background-color: #252526; }
         
         # Refresh UI
         self.update_status_bar()
+    
+    def save_random_presets_from_main(self):
+        """Save random presets from main window"""
+        try:
+            from core.random_presets_writer import RandomPresetsWriter
+            
+            # Write to XML
+            xml_content = RandomPresetsWriter.write(self.random_presets_file)
+            
+            # Save via file manager
+            self.file_manager.write_file('cfgrandompresets.xml', xml_content)
+            
+            # Clear undo/redo stacks on save
+            self.undo_stack.clear()
+            self.redo_stack.clear()
+            
+            # Clear modified flag
+            self.has_random_preset_changes = False
+            
+            # Update UI
+            self.random_presets_tab.update_button_states()
+            self.update_status_bar()
+            
+            print(f"Saved cfgrandompresets.xml ({self.random_presets_file.get_total_preset_count()} presets)")
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Save Error",
+                f"Failed to save cfgrandompresets.xml:\n{str(e)}"
+            )
+    
+    def save_spawnabletypes_files(self, files_to_save: List[SpawnableTypesFile]):
+        """Save spawnable types files"""
+        from core.spawnabletypes_writer import SpawnableTypesWriter
+        
+        errors = []
+        saved_count = 0
+        
+        for spawnable_types_file in files_to_save:
+            try:
+                # Write to XML
+                xml_content = SpawnableTypesWriter.write(spawnable_types_file)
+                
+                # Save via file manager
+                self.file_manager.write_file(spawnable_types_file.source_file, xml_content)
+                
+                saved_count += 1
+                print(f"Saved {spawnable_types_file.source_file} ({len(spawnable_types_file.types)} types)")
+                
+            except Exception as e:
+                errors.append({
+                    'file': spawnable_types_file.source_file,
+                    'error': str(e),
+                    'traceback': traceback.format_exc()
+                })
+        
+        # Clear modified flag if all saved successfully
+        if saved_count > 0 and not errors:
+            self.has_spawnabletypes_changes = False
+            
+            # Clear undo/redo stacks
+            self.undo_stack.clear()
+            self.redo_stack.clear()
+        
+        # Update UI
+        self.update_status_bar()
+        
+        # Show results
+        if errors:
+            error_msg = f"Saved {saved_count} file(s), but {len(errors)} file(s) failed:\n\n"
+            for err in errors:
+                error_msg += f"• {err['file']}: {err['error']}\n"
+            QMessageBox.warning(self, "Save Completed with Errors", error_msg)
+        elif saved_count > 0:
+            QMessageBox.information(
+                self,
+                "Save Successful",
+                f"Successfully saved {saved_count} spawnable types file(s)."
+            )
     
     def show_save_results(self, success_count: int, errors: List[Dict]):
         """Show save results with error details if any"""

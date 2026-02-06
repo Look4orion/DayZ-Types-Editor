@@ -117,6 +117,19 @@ class TypesEditorTab(QWidget):
         
         layout.addStretch()
         
+        # Sum labels for nominal and min
+        self.nominal_sum_label = QLabel("Σ Nominal: 0")
+        self.nominal_sum_label.setStyleSheet(
+            "QLabel { background-color: #2d7d46; color: white; padding: 4px 8px; border-radius: 3px; font-weight: bold; }"
+        )
+        layout.addWidget(self.nominal_sum_label)
+        
+        self.min_sum_label = QLabel("Σ Min: 0")
+        self.min_sum_label.setStyleSheet(
+            "QLabel { background-color: #a05e00; color: white; padding: 4px 8px; border-radius: 3px; font-weight: bold; }"
+        )
+        layout.addWidget(self.min_sum_label)
+        
         # Active filters label
         self.active_filters_label = QLabel("0 Active Filters")
         self.active_filters_label.setStyleSheet(
@@ -773,7 +786,15 @@ class TypesEditorTab(QWidget):
         """Populate table with filtered items"""
         self.item_table.setRowCount(len(self.filtered_items))
         
+        # Calculate sums for nominal and min
+        total_nominal = 0
+        total_min = 0
+        
         for row, item in enumerate(self.filtered_items):
+            # Add to sums
+            total_nominal += item.nominal
+            total_min += item.min
+            
             # Name
             name_item = QTableWidgetItem(item.name)
             if item.modified:
@@ -785,6 +806,10 @@ class TypesEditorTab(QWidget):
             if item.modified:
                 path_item.setForeground(QColor("#51cf66"))
             self.item_table.setItem(row, 1, path_item)
+        
+        # Update sum labels
+        self.nominal_sum_label.setText(f"Σ Nominal: {total_nominal:,}")
+        self.min_sum_label.setText(f"Σ Min: {total_min:,}")
     
     def clear_filters(self):
         """Clear all filters"""

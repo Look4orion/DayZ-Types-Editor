@@ -1,9 +1,9 @@
 """
 Economy Core XML Parser
-Parses cfgEconomyCore.xml to find all types.xml file paths
+Parses cfgEconomyCore.xml to find all types.xml and spawnabletypes.xml file paths
 """
 import xml.etree.ElementTree as ET
-from typing import List
+from typing import List, Tuple
 
 class EconomyParser:
     """Parser for cfgEconomyCore.xml"""
@@ -12,30 +12,47 @@ class EconomyParser:
     def parse(xml_content: str) -> List[str]:
         """
         Parse cfgEconomyCore.xml and return list of types.xml file paths
-        Returns: List of relative file paths
+        Returns: List of relative file paths (backward compatibility)
+        """
+        types_files, _ = EconomyParser.parse_all(xml_content)
+        return types_files
+    
+    @staticmethod
+    def parse_all(xml_content: str) -> Tuple[List[str], List[str]]:
+        """
+        Parse cfgEconomyCore.xml and return lists of types and spawnabletypes file paths
+        Returns: (types_files, spawnabletypes_files)
         """
         try:
             root = ET.fromstring(xml_content)
             types_files = []
+            spawnabletypes_files = []
             
             # Find all <ce> elements that contain file elements
             for ce_elem in root.findall('.//ce'):
                 folder = ce_elem.get('folder', '')
                 
-                # Find all <file> elements with type="types" within this ce element
+                # Find all <file> elements within this ce element
                 for file_elem in ce_elem.findall('file'):
                     file_type = file_elem.get('type')
                     file_name = file_elem.get('name')
                     
-                    if file_type == 'types' and file_name:
-                        # Combine folder and filename
-                        if folder:
-                            full_path = f"{folder}/{file_name}"
-                        else:
-                            full_path = file_name
+                    if not file_name:
+                        continue
+                    
+                    # Combine folder and filename
+                    if folder:
+                        full_path = f"{folder}/{file_name}"
+                    else:
+                        full_path = file_name
+                    
+                    # Categorize by type
+                    if file_type == 'types':
                         types_files.append(full_path)
+                    elif file_type == 'spawnabletypes':
+                        spawnabletypes_files.append(full_path)
             
-            return types_files
+            return types_files, spawnabletypes_files
             
         except ET.ParseError as e:
             raise ValueError(f"Failed to parse cfgEconomyCore.xml: {str(e)}")

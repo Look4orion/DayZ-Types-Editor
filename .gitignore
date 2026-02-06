@@ -65,12 +65,12 @@ config.json
 backups/
 cache/
 
+# Release automation scripts (local only)
+release.bat
+update_version.bat
+
 # Build artifacts
 dist/
 build/
 *.exe
-<<<<<<< HEAD
 *.zip
-=======
-*.zip
->>>>>>> ae17e1d3df9de3bae6cafb0adce4246ccdab1f99
