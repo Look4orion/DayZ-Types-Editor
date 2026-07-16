@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support
 
 ---
+## [2.0.1] - 2026-02-06
+
+### Fixed
+- **Batch Operations Multi-Select Bug**: Selecting multiple Usage, Value, or Tag 
+  checkboxes in a single batch operation now correctly applies all selections. 
+  Previously, each checkbox rebuilt its change list from the item's original 
+  values, so only the last checked box in that field group was actually applied — 
+  earlier selections were silently overwritten and lost.
+
+---
 
 ## [2.0.0] - 2025-01-17
 
