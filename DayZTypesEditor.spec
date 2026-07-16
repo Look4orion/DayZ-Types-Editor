@@ -1,75 +1,44 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-block_cipher = None
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[
-        'paramiko',
-        'cryptography',
-        'PyQt5',
-        'PyQt5.QtCore',
-        'PyQt5.QtGui',
-        'PyQt5.QtWidgets',
-        'PyQt5.sip',
-        'sip',
-        'ui.main_window',
-        'ui.types_editor',
-        'ui.settings_tab',
-        'ui.batch_ops',
-        'ui.new_item_dialog',
-        'ui.sftp_dialog',
-        'ui.startup_dialog',
-        'ui.save_dialog',
-        'ui.loading_progress_dialog',
-        'ui.file_error_dialog',
-        'ui.draggable_spinbox',
-        'ui.toggle_switch',
-        'config.app_config',
-        'config.sftp_manager',
-        'config.local_file_manager',
-        'core.backup_manager',
-        'core.limits_parser',
-        'core.economy_parser',
-        'core.xml_parser',
-        'models.type_item',
-        'models.types_file',
-        'version',
-    ],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
+    optimize=0,
 )
-
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='DayZTypesEditor',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=False,  # No console window
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # Add icon path here if you have one
+)
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='DayZTypesEditor',
 )

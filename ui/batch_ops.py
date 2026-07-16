@@ -407,9 +407,15 @@ class BatchOperationsDialog(QDialog):
                         field_value = controls['field_value']  # e.g., 'Military'
                         is_enabled = controls['value'].isChecked()  # ON or OFF
                         
-                        # Get current list
-                        old_list = getattr(item, field_type)
-                        new_list = list(old_list)  # Copy
+                        # Get the item's original list for comparison
+                        old_list = list(getattr(item, field_type))
+
+                        # If this batch already staged a change for the same field,
+                        # continue building from that staged list instead of starting over.
+                        if field_type in item_data['changes']:
+                            new_list = list(item_data['changes'][field_type]['new'])
+                        else:
+                            new_list = list(old_list)
                         
                         # Add or remove based on toggle
                         if is_enabled and field_value not in new_list:
